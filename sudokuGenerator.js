@@ -1,10 +1,13 @@
 /* Sudoku generator using Genetic Algoritm */
 
 /* GA Config */
-PopulationSize = 5000;
-SelectTheFittest = 500;
-BreedRate = 500;
-MutationRate = 0.1;
+constanta = 0.5;
+populationSize = 5000 * constanta;
+selectTheFittest = 500 * constanta;
+breedNumber = 500 * constanta;
+mutationRate = 0.1;
+prmMutationRate = 0.01;
+mutProb = 0.04;
 /****************/
 
 geneticAlgoritm();
@@ -27,12 +30,13 @@ function geneticAlgoritm(){
     var solution = -1;
     var solutionIndividual;
     var TempPopulation =[];
-    var population = initializePopulation(PopulationSize);
+    var population = initializePopulation(populationSize);
        while(solution!=0) {
            evaulate(population);
-           TempPopulation = selection(population,SelectTheFittest);
-           population = crossover(population, BreedRate);
-           population = mutation(population, 0.1);
+           TempPopulation = selection(population,selectTheFittest);
+           crossover(population, breedNumber);
+           indxMutation(population, mutationRate);
+           permMutation(population, prmMutationRate,mutProb);
            population.push(...TempPopulation);
            solutionIndividual = TempPopulation[0];
            solution = solutionIndividual.fittnes;
@@ -83,7 +87,7 @@ function selection(population,kill){
 
 }
 
-function mutation(population,mutationRate){ // Change 2 indexes in random row
+function indxMutation(population,mutationRate){ // Switch 2 indexes in random row
     var individual,row,index1,index2,temp;
         for(var i=0;i<population.length*mutationRate;i++) {
             individual = Math.floor(Math.random() * population.length);
@@ -93,6 +97,21 @@ function mutation(population,mutationRate){ // Change 2 indexes in random row
             temp = population[individual].value[row][index1];
             population[individual].value[row][index1] = population[individual].value[row][index2];
             population[individual].value[row][index2] = temp;
+        }
+    return population;
+}
+
+function permMutation(population,mutationRate,prob){ // Switch 2 indexes in random row
+    var individual,row,rowValue;
+        for(var i=0;i<population.length*mutationRate;i++) {
+            if(Math.random() < prob) {
+                individual = Math.floor(Math.random() * population.length);
+                row = Math.floor(Math.random() * 9);//0-8
+                rowValue = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+                for (var j = 0; j < 9; j++) {
+                    population[individual].value[row][j] = rowValue[j];
+                }
+            }
         }
     return population;
 }
